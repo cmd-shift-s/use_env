@@ -1,6 +1,7 @@
 import { CommandModule } from 'yargs'
 import { prompt } from 'enquirer'
 import { execCommand } from '../lib/exec'
+import { parseStrToArrayJson } from '../lib/parse'
 
 interface Cluster {
   name: string
@@ -12,36 +13,20 @@ interface Cluster {
   num_nodes: string
   status: string
 }
+
 const CLUSTER_PROPERTIES: Array<keyof Cluster> = [
   'name', 'location', 'master_version', 'master_ip', 'machine_type', 'node_version', 'num_nodes', 'status',
 ]
 
-function parseClusters(str: string) {
-  // remove header and lastline
-  const list = str.split('\n').slice(1, -1)
-
-  const clusters: Record<string, Cluster> = {}
-
-  for (const item of list) {
-    const cluster = item
-      .replace(/\s+/g, ' ')
-      .split(' ')
-      .reduce((cluster, val, index) => {
-        const property = CLUSTER_PROPERTIES[index]
-        cluster[property] = val
-        return cluster
-      }, {} as Cluster)
-
-    clusters[cluster.name] = cluster
-  }
-
-  return clusters
+interface GCloudCommandOptions {
+  withClusterCredential?: boolean
 }
 
-async function activeGcloudConfiguration({
-  env,
-  withClusterCredential = false,
-}: {env: string, withClusterCredential: boolean}) {
+interface ActiveGCloudConfigurationParams extends GCloudCommandOptions {
+  env: string
+}
+
+async function activeGCloudConfiguration({ env, withClusterCredential }: ActiveGCloudConfigurationParams) {
   const cmd = `gcloud config configurations activate ${env}`
 
   await execCommand(cmd)
@@ -51,15 +36,15 @@ async function activeGcloudConfiguration({
     const list = await execCommand('gcloud container clusters list')
     console.log(list)
 
-    const clusters = parseClusters(list!)
-    const clusterNames = Object.keys(clusters)
+    const clusters = parseStrToArrayJson<Cluster>(list!, CLUSTER_PROPERTIES)
+    const clusterNames = clusters.map(c => c.name)
 
     let cluster: Cluster | undefined
 
     if (clusterNames.length === 0) {
       console.log('Not found clusters')
     } else if (clusterNames.length === 1) {
-      cluster = clusters[clusterNames[0]]
+      cluster = clusters[0]
     } else {
       const res = await prompt<{name: string}>({
         type: 'select',
@@ -69,7 +54,7 @@ async function activeGcloudConfiguration({
         choices: clusterNames
       })
 
-      cluster = clusters[res.name]
+      cluster = clusters.find(c => c.name === res.name)
     }
 
     if (!cluster) {
@@ -86,20 +71,21 @@ const command: CommandModule = {
   aliases: 'gk',
   describe: 'google cloud platform',
   builder: yargs => {
-    // for env
-    yargs.command<{withClusterCredential: boolean}>('prod', 'production', () => {}, (args) => {
-      activeGcloudConfiguration({
+    // env
+    yargs.command<GCloudCommandOptions>('prod', 'production', () => {}, (args) => {
+      activeGCloudConfiguration({
         env: 'prod',
-        withClusterCredential: args.withClusterCredential
+        ...args,
       })
     })
-    yargs.command<{withClusterCredential: boolean}>('dev', 'development', () => {}, (args) => {
-      activeGcloudConfiguration({
+    yargs.command<GCloudCommandOptions>('dev', 'development', () => {}, (args) => {
+      activeGCloudConfiguration({
         env: 'dev',
-        withClusterCredential: args.withClusterCredential
+        ...args,
       })
     })
 
+    // options
     yargs
       .option('with-cluster-credential', {
         type: 'boolean',
