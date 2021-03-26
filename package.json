@@ -1,0 +1,43 @@
+{
+  "name": "use_env",
+  "version": "1.0.0",
+  "description": "CLI 자동완성으로 환경 변경하기",
+  "main": "dist/cli.js",
+  "scripts": {
+    "prechmod:cli": "npm run build",
+    "chmod:cli": "chmod u+x ./dist/cli.js",
+    "prelink": "npm run chmod:cli",
+    "link": "ln -sf $(pwd)/dist/cli.js /usr/local/bin/use",
+    "completion": "echo source $(pwd)/completion >> ~/.zshrc",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gongzza/use_env.git"
+  },
+  "keywords": [
+    "zsh",
+    "completion"
+  ],
+  "author": "gongzza <gz.us.to@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/gongzza/use_env/issues"
+  },
+  "homepage": "https://github.com/gongzza/use_env#readme",
+  "dependencies": {
+    "enquirer": "^2.3.6",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.35",
+    "@types/yargs": "^16.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
+    "eslint": "^7.22.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "typescript": "^4.2.3"
+  }
+}

@@ -1,0 +1,19 @@
+###-begin-use-completions-###
+#
+# yargs command completion script
+#
+# Installation: use completion >> ~/.zshrc
+#    or use completion >> ~/.zsh_profile on OSX.
+#
+_use_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" use --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _use_yargs_completions use
+###-end-use-completions-###
+
