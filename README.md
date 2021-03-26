@@ -6,9 +6,6 @@
 # install and build
 npm install && npm run build
 
-# change access permission
-chmod u+x ./dist/cli.js
-
 # link 
 npm run link
 
