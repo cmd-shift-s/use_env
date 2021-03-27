@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { join } from 'path'
 import { Cluster } from './models'
 import { clusterService, configurationService } from './services'
 
@@ -8,7 +9,7 @@ export interface GCloudJson {
   }
 }
 
-export const JSON_FILENAME = 'gcloud.json'
+export const JSON_FILENAME = join(__dirname, 'gcloud.json')
 
 async function generator() {
   console.log('fetch configurations...')
