@@ -11,8 +11,8 @@ export interface GCloudJson {
 
 export const JSON_FILENAME = join(__dirname, 'gcloud.json')
 
-async function generator() {
-  console.log('fetch configurations...')
+export async function generateJson() {
+  console.log('fetch gcloud configurations...')
   const configurations = await configurationService.list()
 
   const currentConfig = configurations.find(c => c.is_active === 'True')
@@ -30,7 +30,7 @@ async function generator() {
 
     await configurationService.active(configuration.name)
 
-    console.log(`fetch ${configuration.name} clusters...`)
+    console.log(`fetch gcloud ${configuration.name} clusters...`)
     const clusters = await clusterService.list()
     config.clusters = clusters.map(c => ({ name: c.name, location: c.location }))
   }
@@ -40,8 +40,6 @@ async function generator() {
   if (configurations.length > 1 && currentConfig) {
     await configurationService.active(currentConfig.name)
   }
-
-  console.log('Finished')
 }
 
-if (module === require.main) { generator() }
+if (module === require.main) { generateJson() }
