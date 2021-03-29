@@ -9,9 +9,6 @@
     "link": "ln -sf $(pwd)/dist/cli.js /usr/local/bin/use",
     "completion": "echo source $(pwd)/completion >> ~/.zshrc",
     "build": "tsc",
-    "prepare": "npm run touch",
-    "touch": "npm run touch:gcloud",
-    "touch:gcloud": "touch src/commands/gcloud/gcloud.json",
     "generateJson": "npm run generateJson:gcloud",
     "generateJson:gcloud": "node dist/commands/gcloud/generate-json.js"
   },
