@@ -1,5 +1,9 @@
 import fs from 'fs'
 
 export function readFileSync(filename: string) {
-  return JSON.parse(fs.readFileSync(filename).toString())
+  if (fs.existsSync(filename)) {
+    return JSON.parse(fs.readFileSync(filename).toString())
+  } else {
+    return null
+  }
 }
